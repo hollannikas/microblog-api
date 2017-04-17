@@ -32,6 +32,14 @@
   (j/delete! db/spec :posts ["id=?" id])
   {:status 204})
 
+(defn allow-cross-origin
+  "middleware function to allow crosss origin"
+  [handler]
+  (fn [request]
+    (let [response (handler request)]
+      (assoc-in response [:headers "Access-Control-Allow-Origin"]
+                "*"))))
+
 (defroutes app-routes
            (context "/api/microblogs" []
              (defroutes microblog-routes
@@ -45,4 +53,5 @@
 (def app
   (-> (handler/api app-routes)
       (middleware/wrap-json-body)
-      (middleware/wrap-json-response)))
+      (middleware/wrap-json-response)
+      (allow-cross-origin)))
