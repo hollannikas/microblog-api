@@ -5,7 +5,8 @@
             [compojure.handler :as handler]
             [ring.middleware.json :as middleware]
             [microblog-api.db :as db]
-            [clojure.java.jdbc :as j])
+            [clojure.java.jdbc :as j]
+            [ring.middleware.cors :refer [wrap-cors]])
   (:import (java.util UUID)))
 
 
@@ -32,14 +33,6 @@
   (j/delete! db/spec :posts ["id=?" id])
   {:status 204})
 
-(defn allow-cross-origin
-  "middleware function to allow crosss origin"
-  [handler]
-  (fn [request]
-    (let [response (handler request)]
-      (assoc-in response [:headers "Access-Control-Allow-Origin"]
-                "*"))))
-
 (defroutes app-routes
            (context "/api/microblogs" []
              (defroutes microblog-routes
@@ -52,6 +45,9 @@
 
 (def app
   (-> (handler/api app-routes)
+      (wrap-cors :access-control-allow-origin #".*"
+                 :access-control-allow-methods [:get :post :delete :options]
+                 :access-control-allow-headers ["Origin" "X-Requested-With"
+                                                "Content-Type" "Accept"])
       (middleware/wrap-json-body)
-      (middleware/wrap-json-response)
-      (allow-cross-origin)))
+      (middleware/wrap-json-response)))

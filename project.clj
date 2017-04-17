@@ -8,7 +8,8 @@
                  [ring/ring-json "0.4.0"]
                  [clojure.jdbc/clojure.jdbc-c3p0 "0.3.1"]
                  [org.clojure/java.jdbc "0.6.1"]
-                 [com.h2database/h2 "1.4.194"]]
+                 [com.h2database/h2 "1.4.194"]
+                 [ring-cors "0.1.9"]]
   :plugins [[lein-ring "0.11.0"]]
   :ring {:handler microblog-api.handler/app}
   :profiles
